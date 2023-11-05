@@ -27,6 +27,26 @@ async function run() {
     await client.connect();
 
     const serviceCollection = client.db('techGadgets').collection('services')
+    const bookServiceCollection = client.db('techGadgets').collection('bookServices')
+
+    app.get('/bookServices', async(req,res) => {
+        const cursor = bookServiceCollection.find();
+        const result = await cursor.toArray();
+        res.send(result)
+    })
+
+    app.get('/services', async(req, res) => {
+        const cursor = serviceCollection.find();
+        const result = await cursor.toArray();
+        res.send(result)
+    })
+
+    app.post('/bookServices', async(req,res)=> {
+        const bookService = req.body;
+        console.log(bookService);
+        const result = await bookServiceCollection.insertOne(bookService)
+        res.send(result);
+    })
 
     app.post('/services', async(req, res) => {
         const newServices = req.body;
@@ -34,6 +54,8 @@ async function run() {
         const result = await serviceCollection.insertOne(newServices);
         res.send(result)
      })
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
