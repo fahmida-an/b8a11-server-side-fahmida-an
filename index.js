@@ -101,6 +101,9 @@ async function run() {
       console.log(req.query.email);
       // console.log('token', req.cookies.token);
       console.log('user in valid token',req.user);
+      if(req.query.email !== req.user.email){
+        return res.status(403).send({message: 'forbidden'})
+      }
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email };
@@ -108,6 +111,13 @@ async function run() {
       const result = await bookServiceCollection.find(query).toArray();
       res.send(result);
     });
+
+    app.get("/allBookServices", async(req,res) => {
+      const cursor = bookServiceCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+      
+    })
 
     app.patch('/bookServices/:id', async(req,res) => {
       const id = req.params.id;
