@@ -89,6 +89,36 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/services/:id", async(req,res)=> {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert: true}
+      const updatedBookServices = req.body;
+      const service = {
+        $set: {
+          serviceImage:updatedBookServices.serviceImage,
+          serviceName:updatedBookServices.serviceName,
+          price:updatedBookServices.price,
+          providerName:updatedBookServices.providerName,
+          providerImage:updatedBookServices.providerImage,
+          providerEmail:updatedBookServices.providerEmail,
+          providerLocation:updatedBookServices.providerLocation,
+          providerDescription:updatedBookServices.providerDescription,
+          details:updatedBookServices.details
+        }
+      }
+      const result = await serviceCollection.updateOne(filter,service,options);
+      res.send(result)
+    })
+
+
+    app.delete("/service/:id", async(req,res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await serviceCollection.deleteOne(query)
+      res.send(result)
+    })
+
     app.post("/bookServices", async (req, res) => {
       const bookService = req.body;
       console.log(bookService);
