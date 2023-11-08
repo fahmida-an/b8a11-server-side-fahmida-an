@@ -8,9 +8,13 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 //middlewares
+// app.use(cors({
+//   origin: ['https://tech-gadget-hub.web.app/'],
+//   credentials: true
+// }));
 app.use(cors({
-  origin: ['http://localhost:5173'],
-  credentials: true
+  origin: 'https://tech-gadget-hub.web.app, http://localhost:5173/',  
+  credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -28,7 +32,8 @@ const client = new MongoClient(uri, {
 
 //middleware made
 const logger = async(req, res, next) => {
-  console.log('called:', req.host, req.originalUrl);
+  console.log('called:', req.method, req.url);
+  // req.host, req.originalUrl
   next();
 }
 
@@ -71,16 +76,22 @@ async function run() {
       res
       .cookie('token', token, {
         httpOnly: true,
-        secure: false
+        secure: true,
+        sameSite: 'none'
       })
       .send({success: true})
     })
 
     //service api
     app.get("/services", logger, async (req, res) => {
-      const cursor = serviceCollection.find();
+      try{
+        const cursor = serviceCollection.find();
       const result = await cursor.toArray();
       res.send(result);
+      }
+      catch(error){
+        res.send({message: error.message})
+      }
     });
     app.post("/services", async (req, res) => {
       const newServices = req.body;
@@ -176,10 +187,10 @@ async function run() {
     
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
